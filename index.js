@@ -19,6 +19,7 @@ class Scratch3WebSocketsBlocks {
          * @type {Runtime}
          */
         this.isRunning = false;
+        this.socketData = "";
         this.runtime = runtime;
     }
 
@@ -67,7 +68,7 @@ class Scratch3WebSocketsBlocks {
                 },
                 {
                 	opcode: 'getSocketState',
-                    blockType: BlockType.REPORTER,
+                    blockType: BlockType.BOOLEAN,
                     text: formatMessage({
                         id: 'websockets.getSocketState',
                         default: 'active',
@@ -93,18 +94,65 @@ class Scratch3WebSocketsBlocks {
                         }
                     }
                 },
+                {
+                	opcode: 'fetchData',
+                    blockType: BlockType.COMMAND,
+                    text: formatMessage({
+                        id: 'websockets.fetchData',
+                        default: 'send command [COMMAND]',
+                        description: 'Send a command to the server'
+                    }),
+                    arguments: {
+                    	COMMAND: {
+                    		type: ArgumentType.STRING,
+                    		menu: 'serverCommands',
+                    		defaultValue: "%_fetch",
+                    		text: "refresh socket data",
+                    	}
+                    }
+                },
+                {
+                	opcode: 'getSocketData',
+                    blockType: BlockType.REPORTER,
+                    text: formatMessage({
+                        id: 'websockets.getSocketData',
+                        default: 'socket data',
+                        description: 'return stored socket data.'
+                    }),
+                },
+
             ],
-            menus: {}
+            menus: {
+            	serverCommands: [
+            		{
+            			value: '%_fetch',
+            			text: 'refresh socket data',
+            		},
+            		{
+            			value: '%_disconnect',
+            			text: 'disconnect from client',
+            		},
+
+            	]
+            }
         };
     }
 
     openSocket () {
     	if (this.isRunning == false) {
     		console.log("Starting socket.");
-    		this.mWS = new WebSocket(mWebSocket); 
-    		//this.mWS.close();
-    		this.isRunning = true;
-    		//break;
+    		this.mWS = new WebSocket(mWebSocket);
+
+    		const self = this; // the functions below are out of the scope
+    		//check if connnecting to the server fails
+    		this.mWS.onerror = function(){
+    			self.isRunning = false;
+    			console.log("failed to connect to the server.");
+    		};
+    		this.mWS.onopen = function(){
+    			self.isRunning = true;
+    			console.log("successfully connected to the server.");
+    		}
     	}
     	else{
     		console.log("Socket is already open.");
@@ -123,14 +171,43 @@ class Scratch3WebSocketsBlocks {
     }
 
    	getSocketState () {
+   		//Check is the server is still running
+   		if (this.isRunning){
+   			var response = this.mWS.readyState;
+   			if (response == 2 || response == 3) {
+   				this.isRunning = false;
+   				console.log("Server has disconnected.")
+   			}
+   		}
    		return this.isRunning;
    	}
 
    	sendData (args) {
    		if (this.isRunning == true) {
-   			this.mWs.send(args.TEXT)
-   			console.log("SENT:", args.TEXT)
+   			this.mWS.send(args.DATA);
+   			console.log("SENT:", args.DATA);
    		}
+   	}
+
+   	fetchData (args) {
+   		if (this.isRunning == true) {
+   			this.mWS.send(args.COMMAND);
+   			console.log("COMMAND:", args.COMMAND);
+   			const self = this; // the function below is out of the scope
+   			//Load response
+   			var message = this.mWS.onmessage = function(event){
+   				self.socketData = String(event.data);
+   				console.log("RECEIVED:", self.socketData);
+   			};
+   		}
+   		else{
+   			this.socketData = "";
+   		}		
+   	}
+
+   	getSocketData () {
+   		//Check is the server is still running
+   		return this.socketData;
    	}
 }
 

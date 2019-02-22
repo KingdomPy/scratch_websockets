@@ -22,6 +22,9 @@ async def client(websocket, path):
             else:
                 await websocket.send(json.dumps(receivedMessages))
                 receivedMessages = []
+                
+        elif data == "%_disconnect":
+            await websocket.send("disconnected from ...")
 
 start_server = websockets.serve(client, '127.0.0.1', 8765)
 
