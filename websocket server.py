@@ -8,9 +8,15 @@ import websockets
 #Data imports
 import json
 
+#Gui imports
+from PyQt5 import QtGui, QtCore
+
+#Address of the other machine it is connected to
+global pairMachine
+
 async def client(websocket, path):
     print("Succesfully connected to scratch.")
-    receivedMessages = ["bob head", "simoan"]
+    receivedMessages = ["bob head", "samoan"]
     while True:
         data = await websocket.recv()
         print("RECEIVED:", data)
