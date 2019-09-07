@@ -250,27 +250,27 @@ class kingdomNet{
     }
 
     getLength(args){
-    	if (args.QUEUE == "channel 1") {
+    	if (args.QUEUE == "Channel 1") {
     		return this.channelOne.length;
-    	} else if (args.QUEUE == "channel 2") {
+    	} else if (args.QUEUE == "Channel 2") {
     		return this.channelTwo.length;
     	};
     }
 
     peakList(args){
-    	if (args.QUEUE == "channel 1") {
+    	if (args.QUEUE == "Channel 1") {
     		return this.channelOne[this.channelOne.length - 1];
-    	} else if (args.QUEUE == "channel 2") {
+    	} else if (args.QUEUE == "Channel 2") {
     		return this.channelTwo[this.channelTwo.length - 1];
     	};
     }
 
     popList(args){
-    	if (args.QUEUE == "channel 1") {
+    	if (args.QUEUE == "Channel 1") {
     		const value = this.channelOne[0];
     		this.channelOne.splice(0,1);
     		return value;
-    	} else if (args.QUEUE == "channel 2") {
+    	} else if (args.QUEUE == "Channel 2") {
     		const value = this.channelTwo[0];
     		this.channelOne.splice(0,1);
     		return value;
@@ -330,7 +330,7 @@ class Scratch3KingdomNetBlocks {
                 	arguments: {
 			            QUEUE: {
 			              type: ArgumentType.STRING,
-			              defaultValue: '1',
+			              defaultValue: 'Channel 1',
 			              menu: "channels",
 			            },
 	          		}
@@ -370,7 +370,7 @@ class Scratch3KingdomNetBlocks {
 			            },
 			            QUEUE: {
 			              type: ArgumentType.STRING,
-			              defaultValue: '1',
+			              defaultValue: 'Channel 1',
 			              menu: "channels",
 			            },
 	          		}
@@ -388,7 +388,7 @@ class Scratch3KingdomNetBlocks {
             ],
             menus: {
             	channels:{
-            		items: [{text: "Channel 1", value:"channel 1"}, {text: "Channel 2", value:"channel 2"}]
+            		items: [{text: "Channel 1", value:"Channel 1"}, {text: "Channel 2", value:"Channel 2"}]
             	}
             }
         };
