@@ -32,7 +32,7 @@ class scratchServer(WebSocketServerProtocol):
     def onMessage(self, payload, isBinary):
         response = self.handle_request(payload)
         self.sendMessage(response.encode(), isBinary)
-
+            
     def send(data):
         payload = json.dumps({
                 "jsonrpc": "2.0",
@@ -75,6 +75,16 @@ class scratchServer(WebSocketServerProtocol):
                     }
                 }
         elif method == "send" or method == "write":
+            #message = request["params"]["message"].encode()
+            #decoded = base64.decodebytes(message)
+            #response = {
+                #"jsonrpc": request["jsonrpc"],
+                #"id": request["id"],
+                #"result":len(decoded)
+                #}
+            #if request["params"]["channel"] == "Channel 1":
+                #self.tcpConnection.send(json.dumps({"method":"send","message":decoded.decode()}).encode())
+
             message = request["params"]["message"].encode()
             decoded = base64.decodebytes(message)
             response = {
@@ -83,14 +93,17 @@ class scratchServer(WebSocketServerProtocol):
                 "result":len(decoded)
                 }
             if request["params"]["channel"] == "Channel 1":
-                self.tcpConnection.send(json.dumps({"method":"send","message":decoded.decode()}).encode())
-                #self.computer.respond(decoded.decode())
+                if decoded.decode() == "join":
+                    self.tcpConnection.send(json.dumps({"method":"join","projectId":1020390}).encode())
+                else:
+                    self.tcpConnection.send(json.dumps({"method":"send","message":decoded.decode()}).encode())
+                
         return json.dumps(response)
 
 # Central server tcp connection
 class MyClient(protocol.Protocol):
     def connectionMade(self):
-        self.transport.write(json.dumps({"method":"join","projectId":1020390}).encode())
+        #self.transport.write(json.dumps({"method":"join","projectId":1020390}).encode())
         self.websocketConnection = factory.protocol
         linkConnection[0] = self.transport # Allow the websocket to message the server
 
