@@ -15,6 +15,11 @@ from autobahn.twisted.websocket import WebSocketServerFactory, \
     WebSocketServerProtocol, \
     listenWS
 
+def base64encode(message):
+    message = base64.b64encode(str(message).encode("utf-8"))
+    message = message.decode("utf-8")
+    return message
+
 class scratchServer(WebSocketServerProtocol):     
     def onOpen(self):
         print("WebSocket connection open.")
@@ -33,7 +38,7 @@ class scratchServer(WebSocketServerProtocol):
                 "jsonrpc": "2.0",
                 "method":"didReceiveMessage",
                 "params":{
-                    "message": self.base64encode(data),
+                    "message": base64encode(data),
                     "encoding": "base64",
                     "channel": 1,
                 }
@@ -81,11 +86,6 @@ class scratchServer(WebSocketServerProtocol):
                 self.tcpConnection.send(json.dumps({"method":"send","message":decoded.decode()}).encode())
                 #self.computer.respond(decoded.decode())
         return json.dumps(response)
-
-    def base64encode(self, message):
-        message = base64.b64encode(str(message).encode("utf-8"))
-        message = message.decode("utf-8")
-        return message
 
 # Central server tcp connection
 class MyClient(protocol.Protocol):
