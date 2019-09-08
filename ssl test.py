@@ -33,7 +33,7 @@ class scratchServer(WebSocketServerProtocol):
                 "jsonrpc": "2.0",
                 "method":"didReceiveMessage",
                 "params":{
-                    "message": data,
+                    "message": self.base64encode(data),
                     "encoding": "base64",
                     "channel": 1,
                 }
@@ -82,6 +82,11 @@ class scratchServer(WebSocketServerProtocol):
                 #self.computer.respond(decoded.decode())
         return json.dumps(response)
 
+    def base64encode(self, message):
+        message = base64.b64encode(str(message).encode("utf-8"))
+        message = message.decode("utf-8")
+        return message
+
 # Central server tcp connection
 class MyClient(protocol.Protocol):
     def connectionMade(self):
@@ -94,6 +99,7 @@ class MyClient(protocol.Protocol):
     
     def dataReceived(self, data):
         self.websocketConnection.send(data.decode())
+
 
 class MyClientFactory(protocol.ClientFactory):
     protocol = MyClient
