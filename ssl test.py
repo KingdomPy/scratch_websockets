@@ -11,6 +11,8 @@ import json, base64
 
 linkConnection = ["tcp","ws"] # Set this to transport so that the scratchServer can send messages to it
 
+messageDictionary = {"method":1, "message": 2, "projectId": 3}
+
 from autobahn.twisted.websocket import WebSocketServerFactory, \
     WebSocketServerProtocol, \
     listenWS
@@ -94,9 +96,9 @@ class scratchServer(WebSocketServerProtocol):
                 }
             if request["params"]["channel"] == "Channel 1":
                 if decoded.decode() == "join":
-                    self.tcpConnection.send(json.dumps({"method":"join","projectId":1020390}).encode())
+                    self.tcpConnection.send(json.dumps({commandDictionary["method"]:"join",commandDictionary["projectId"]:1020390}).encode())
                 else:
-                    self.tcpConnection.send(json.dumps({"method":"send","message":decoded.decode()}).encode())
+                    self.tcpConnection.send(json.dumps({commandDictionary["method"]:"send",commandDictionary["message"]:decoded.decode()}).encode())
                 
         return json.dumps(response)
 
